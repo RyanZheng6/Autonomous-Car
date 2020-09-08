@@ -1,0 +1,284 @@
+//DO NOT TOUCH THESE 3 VARIABLES
+const int SETUP_TIME = 5000;
+const int AUTONOMOUS_TIME = 15000;
+const int STOP_TIME = 2000;
+int sens1 = A0;
+int sens2 = A1;
+int photo1 = A2;
+int photo2 = A3;
+int photo3 = A4;
+int photo4 = A5;
+int forward1 = 6;
+int backward1 = 9;
+int forward2 = 10;
+int backward2 = 11;
+long mil;
+long currentT = 0;
+int counter = 0;
+int c2 = 0;
+boolean once = true;
+void setup() {
+  // put your setup code here, to run once:
+    Serial.begin(9600);
+}
+//============================================================
+//DO NOT WRITE CODE IN THE LOOP METHOD.
+void loop() {
+  Serial.println(counter);
+  //DO NOT TOUCH THIS CODE
+  mil = millis();
+  if(mil<SETUP_TIME)
+  {
+    //LEAVE THIS BLANK
+  }
+  else if(mil<AUTONOMOUS_TIME+SETUP_TIME)
+  {
+    autonomousMode();
+  }
+  else if(mil<AUTONOMOUS_TIME+SETUP_TIME+STOP_TIME)
+  {
+    fullStop();
+  }
+  else
+  {
+    teleOpMode();
+  } 
+
+flex();
+}
+//============================================================
+
+//WRITE CODE IN HERE:  YOUR AUTONOMOUS CODE GOES IN HERE.  PART 1 OF RACE
+
+void autonomousMode(){
+
+    int flexstate1 = analogRead(sens1);
+    int flexstate2 = analogRead(sens2);
+    //800 - 940
+    //750 - 910
+    int flex1 = map(flexstate1, 800, 950, 0, 300);
+    int flex2 = map(flexstate2, 720, 925, 0, 300);
+    if(mil < SETUP_TIME + 5000){
+      if(flex1 > 200 && flex2 < 200){ 
+        turnRight();
+        Serial.println("a");
+      }
+      else if(flex2 > 200 && flex1 < 200){
+        turnLeft();
+        Serial.println("b");
+      }
+      else{
+        straight();
+      }
+    }
+    else if(mil < SETUP_TIME + 6000){
+      turnRight();
+    }
+    else if (mil < SETUP_TIME + 8000){
+      if(flex1 > 200 && flex2 < 200){ 
+        turnRight();
+        Serial.println("a");
+      }
+      else if(flex2 > 200 && flex1 < 200){
+        turnLeft();
+        Serial.println("b");
+      }
+      else{
+        straight();
+      }
+    }
+    else if(mil < SETUP_TIME + 9000){
+      turnLeft();
+    }
+    else{
+      if(flex1 > 200 && flex2 < 200){ 
+        turnRight();
+        Serial.println("a");
+      }
+      else if(flex2 > 200 && flex1 < 200){
+        turnLeft();
+        Serial.println("b");
+      }
+      else{
+        straight();
+      }
+    }
+/*
+    if(mil < SETUP_TIME + 5000){
+    if(flex1 > 200 && flex2 < 200){ 
+      turnRight();
+      Serial.println("a");
+    }
+    else if(flex2 > 200 && flex1 < 200){
+      turnLeft();
+      Serial.println("b");
+    }
+    else if(flex1 > 250 && flex2 > 250 || counter == 1){
+      Serial.println("c");
+      if(c2 == 0){
+        Serial.println("d");
+        counter = 1;
+        if(once){
+          Serial.println("e");
+          currentT = mil;
+          once = false;
+        }
+        if(mil > currentT + 1000){
+          counter = 0;
+          c2 = 1;
+          Serial.println("f");
+        }
+        else{
+          
+          turnLeft();
+          Serial.println("g");
+        }
+      }
+      else{
+      turnRight();
+      Serial.println("h");
+      }
+    }
+    else{
+      Serial.println("x");
+      straight();
+    }
+    }
+    else if (mil < SETUP_TIME + 7000) {
+      turnLeft();
+    }
+    else{
+      if(flex1 > 200 && flex2 < 200){ 
+      turnRight();
+      Serial.println("a");
+    }
+    else if(flex2 > 200 && flex1 < 200){
+      turnLeft();
+      Serial.println("b");
+    }
+    else if(flex1 > 250 && flex2 > 250 || counter == 1){
+      Serial.println("c");
+      if(c2 == 0){
+        Serial.println("d");
+        counter = 1;
+        if(once){
+          Serial.println("e");
+          currentT = mil;
+          once = false;
+        }
+        if(mil > currentT + 1000){
+          counter = 0;
+          c2 = 1;
+          Serial.println("f");
+        }
+        else{
+          
+          turnLeft();
+          Serial.println("g");
+        }
+      }
+      else{
+      turnRight();
+      Serial.println("h");
+      }
+    }
+    else{
+      Serial.println("x");
+      straight();
+    }
+    }
+    */
+}
+
+//WRITE CODE IN HERE:  YOUR TELEOP CODE GOES IN HERE.  PART 2 OF RACE
+//you MUST write this method
+void teleOpMode(){
+  int photostate1 = analogRead(photo1);
+  int photostate2 = analogRead(photo2);
+  int photostate3 = analogRead(photo3);
+  int photostate4 = analogRead(photo4);
+
+
+
+  if(500 > photostate1 && 500 > photostate2 && 500 > photostate3 && 500 > photostate4){
+    fullStop();
+  }
+  else if(photostate1 > photostate2 && photostate1 > photostate3 && photostate1 > photostate4){
+    straight();
+  }
+  else if(photostate2 > photostate1 && photostate2 > photostate3 && photostate2 > photostate4){
+    turnLeft();
+  }
+  else if(photostate3 > photostate1 && photostate3 > photostate2 && photostate3 > photostate4){
+    turnRight();
+  }
+  else if(photostate4 > photostate1 && photostate4 > photostate2 && photostate4 > photostate3){
+    back();
+  }
+}
+//WRITE CODE IN HERE:  YOU SHOULD MAKE EVERY MOTOR STOP 
+//you MUST write this method
+void fullStop(){
+  analogWrite(forward1, 0);
+  analogWrite(backward1, 0);
+  analogWrite(forward2, 0);
+  analogWrite(backward2, 0);
+}
+void straight(){
+  analogWrite(forward1, 255);
+  analogWrite(backward1, 0);
+  analogWrite(forward2, 255);
+  analogWrite(backward2, 0);
+}
+
+void back(){
+  analogWrite(forward1, 0);
+  analogWrite(backward1, 255);
+  analogWrite(forward2, 0);
+  analogWrite(backward2, 255);
+}
+
+void turnLeft(){
+  analogWrite(forward1, 0);
+  analogWrite(backward1, 255);
+  analogWrite(forward2, 255);
+  analogWrite(backward2, 0);
+}
+
+void turnRight(){
+  analogWrite(forward1, 255);
+  analogWrite(backward1, 0);
+  analogWrite(forward2, 0);
+  analogWrite(backward2, 255);
+}
+
+void light(){
+  int p1 = analogRead(photo1);
+  int p2 = analogRead(photo2);
+  int p3 = analogRead(photo3);
+  int p4 = analogRead(photo4);
+  Serial.print("p1: ");
+  Serial.print(p1);
+  Serial.print(" p2: ");
+  Serial.print(p2);
+  Serial.print(" p3: ");
+  Serial.print(p3);
+  Serial.print(" p4: ");
+  Serial.println(p4);
+}
+
+void flex(){
+    int flexstate1 = analogRead(sens1);
+    int flexstate2 = analogRead(sens2);
+    int flex1 = map(flexstate1, 800, 950, 0, 300);
+    int flex2 = map(flexstate2, 720, 925, 0, 300);
+
+  Serial.print("f1: ");
+  Serial.print(flex1);
+  Serial.print(" f1: ");
+  Serial.print(flexstate1);
+  Serial.print(" f2: ");
+  Serial.print(flex2);
+  Serial.print(" f2: ");
+  Serial.println(flexstate2);
+}
